@@ -4,15 +4,9 @@ import {
   useCreateUserWithEmailAndPassword,
   useSendEmailVerification,
 } from "react-firebase-hooks/auth";
-import {
-  Button,
-  KeyboardAvoidingView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 import auth from "../../firebase.init";
+import CustomButton from "../CustomButton";
 
 export default function Registration() {
   const [name, setName] = useState("");
@@ -25,6 +19,7 @@ export default function Registration() {
   const [passwordReq, setPasswordReq] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passError, setPassError] = useState("");
+  const [firebaseError, setFirebaseError] = useState("");
 
   const [createUserWithEmailAndPassword, user, loading, error] =
     useCreateUserWithEmailAndPassword(auth);
@@ -84,98 +79,111 @@ export default function Registration() {
     }
   }, [user]);
 
+  useEffect(() => {
+    if (error) {
+      if (error.message.includes("invalid-email")) {
+        setFirebaseError("Email is invalid");
+      } else if (error.message.includes("at least 6 characters")) {
+        setFirebaseError("Password should be 6 characters");
+      } else if (error.message.includes("email-already-in-use")) {
+        setFirebaseError("Email is already used");
+      } else {
+        setFirebaseError("");
+      }
+    }
+  });
+
   return (
-    <KeyboardAvoidingView>
+    <View style={styles.container}>
       <ToastContainer />
-      <View style={styles.container}>
-        <View>
-          <Text style={styles.label}>
-            Name<Text style={styles.errorText}>*</Text>
-          </Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your name"
-            value={name}
-            textContentType="username"
-            onChangeText={(text) => setName(text)}
-          />
-          <Text style={styles.errorText}>
-            {nameReq !== "" ? nameReq : null}
-          </Text>
-        </View>
-
-        <View>
-          <Text style={styles.label}>
-            Date of Birth<Text style={styles.errorText}>*</Text>
-          </Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your birth date"
-            value={birth}
-            onChangeText={(text) => setBirth(text)}
-          />
-          <Text style={styles.errorText}>
-            {birthReq !== "" ? birthReq : null}
-          </Text>
-        </View>
-
-        <View>
-          <Text style={styles.label}>
-            Email<Text style={styles.errorText}>*</Text>
-          </Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your email"
-            textContentType="emailAddress"
-            value={email}
-            onChangeText={(text) => setEmail(text)}
-            keyboardType="email-address"
-          />
-          <Text style={styles.errorText}>
-            {emailReq !== "" ? emailReq : null}
-          </Text>
-        </View>
-
-        <View>
-          <Text style={styles.label}>
-            Password<Text style={styles.errorText}>*</Text>
-          </Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your password"
-            value={password}
-            textContentType="password"
-            onChangeText={(text) => setPassword(text)}
-            secureTextEntry
-          />
-          <Text style={styles.errorText}>
-            {passwordReq !== "" ? passwordReq : null}
-          </Text>
-        </View>
-
-        <View>
-          <Text style={styles.label}>
-            Confirm Password<Text style={styles.errorText}>*</Text>
-          </Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Confirm Password"
-            textContentType="password"
-            value={confirmPassword}
-            onChangeText={(text) => setConfirmPassword(text)}
-            secureTextEntry
-          />
-          <Text style={styles.errorText}>
-            {passError !== "" ? passError : null}
-          </Text>
-        </View>
-
-        <Button title="Select" onPress={handleImgSelection} />
-
-        <Text style={styles.errorText}>{error ? error.message : ""}</Text>
-        <Button title="Register" onPress={handleRegistration} />
+      <View style={styles.field}>
+        <Text style={styles.label}>
+          Name<Text style={styles.errorText}>*</Text>
+        </Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your name"
+          value={name}
+          textContentType="username"
+          placeholderTextColor="#B5B5B5"
+          onChangeText={(text) => setName(text)}
+        />
+        <Text style={styles.errorText}>{nameReq !== "" ? nameReq : null}</Text>
       </View>
-    </KeyboardAvoidingView>
+
+      <View style={styles.field}>
+        <Text style={styles.label}>
+          Date of Birth<Text style={styles.errorText}>*</Text>
+        </Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your birth date"
+          placeholderTextColor="#B5B5B5"
+          value={birth}
+          onChangeText={(text) => setBirth(text)}
+        />
+        <Text style={styles.errorText}>
+          {birthReq !== "" ? birthReq : null}
+        </Text>
+      </View>
+
+      <View style={styles.field}>
+        <Text style={styles.label}>
+          Email<Text style={styles.errorText}>*</Text>
+        </Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your email"
+          placeholderTextColor="#B5B5B5"
+          textContentType="emailAddress"
+          value={email}
+          onChangeText={(text) => setEmail(text)}
+          keyboardType="email-address"
+        />
+        <Text style={styles.errorText}>
+          {emailReq !== "" ? emailReq : null}
+        </Text>
+      </View>
+
+      <View style={styles.field}>
+        <Text style={styles.label}>
+          Password<Text style={styles.errorText}>*</Text>
+        </Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your password"
+          placeholderTextColor="#B5B5B5"
+          value={password}
+          textContentType="password"
+          onChangeText={(text) => setPassword(text)}
+          secureTextEntry
+        />
+        <Text style={styles.errorText}>
+          {passwordReq !== "" ? passwordReq : null}
+        </Text>
+      </View>
+
+      <View style={styles.field}>
+        <Text style={styles.label}>
+          Confirm Password<Text style={styles.errorText}>*</Text>
+        </Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Confirm Password"
+          placeholderTextColor="#B5B5B5"
+          textContentType="password"
+          value={confirmPassword}
+          onChangeText={(text) => setConfirmPassword(text)}
+          secureTextEntry
+        />
+        <Text style={styles.errorText}>
+          {passError !== "" ? passError : null}
+        </Text>
+      </View>
+
+      <Text style={styles.errorText}>{firebaseError ? firebaseError : ""}</Text>
+      <CustomButton title="Register" onPress={handleRegistration} />
+    </View>
   );
 }
 
@@ -184,25 +192,28 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 16,
+    backgroundColor: "#5865F2",
+    padding: "30px",
+  },
+  field: {
+    marginBottom: 16,
+  },
+  label: {
+    textTransform: "uppercase",
+    fontWeight: 500,
+    color: "white",
+    textAlign: "left",
+    width: "100%",
   },
   input: {
     width: "100%",
     height: 40,
-    borderWidth: 1,
-    borderColor: "gray",
-    marginBottom: 12,
+    borderRadius: "10px",
+    backgroundColor: "white",
+    marginVertical: 5,
     paddingHorizontal: 10,
   },
   errorText: {
     color: "red",
-  },
-  label: {
-    textTransform: "uppercase",
-    fontWeight: "bold",
-    // marginTop: "10px",
-    // marginBottom: "5px",
-    textAlign: "left",
-    width: "100%",
   },
 });
