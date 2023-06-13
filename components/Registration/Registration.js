@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
-import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
+import {
+  useCreateUserWithEmailAndPassword,
+  useSendEmailVerification,
+} from "react-firebase-hooks/auth";
 import {
   Button,
   KeyboardAvoidingView,
@@ -25,13 +28,9 @@ export default function Registration() {
 
   const [createUserWithEmailAndPassword, user, loading, error] =
     useCreateUserWithEmailAndPassword(auth);
+  const [sendEmailVerification, sending] = useSendEmailVerification(auth);
 
-  const handleRegistration = () => {
-    // Handle registration logic here
-    console.log("Name:", name);
-    console.log("Email:", email);
-    console.log("Password:", password);
-
+  const handleRegistration = async () => {
     if (name === "") {
       setNameReq("Name is Required");
       setBirthReq("");
@@ -53,13 +52,16 @@ export default function Registration() {
       setEmailReq("");
       setNameReq("");
     } else if (password === confirmPassword) {
-      createUserWithEmailAndPassword(email, password);
+      await createUserWithEmailAndPassword(email, password);
+      await sendEmailVerification();
+      if (!error) {
+        toast.success("Sent email for verification");
+      }
       setPassError("");
       setBirthReq("");
       setEmailReq("");
       setNameReq("");
       setPasswordReq("");
-      // toast.success("Register Done");
     } else {
       setPassError("Password and Confirm Password not matched");
       setBirthReq("");
@@ -69,9 +71,11 @@ export default function Registration() {
     }
 
     // Clear form fields
-    // setName("");
-    // setEmail("");
-    // setPassword("");
+    setName("");
+    setBirth("");
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
   };
 
   useEffect(() => {
@@ -165,6 +169,8 @@ export default function Registration() {
             {passError !== "" ? passError : null}
           </Text>
         </View>
+
+        <Button title="Select" onPress={handleImgSelection} />
 
         <Text style={styles.errorText}>{error ? error.message : ""}</Text>
         <Button title="Register" onPress={handleRegistration} />
