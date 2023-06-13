@@ -90,7 +90,7 @@ export default function Registration() {
       } else {
         setFirebaseError("");
       }
-    }
+    } else setFirebaseError("");
   });
 
   return (
